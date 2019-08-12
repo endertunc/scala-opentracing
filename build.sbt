@@ -31,7 +31,8 @@ lazy val tapir = (project in file("tapir"))
   .settings(
     name := "Scala Opentracing Tapir Integration",
     bintrayPackage := "scala-opentracing-tapir",
-    crossScalaVersions := supportedScalaVersions
+    crossScalaVersions := supportedScalaVersions,
+    libraryDependencies ++= Tapir.all
   )
   .dependsOn(root)
 
