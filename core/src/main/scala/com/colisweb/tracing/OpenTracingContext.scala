@@ -3,6 +3,8 @@ package com.colisweb.tracing
 import cats.effect._
 import cats.implicits._
 import io.opentracing._
+import io.opentracing.util.GlobalTracer
+import com.typesafe.scalalogging.StrictLogging
 
 /**
   * This is meant to be used with any OpenTracing compatible tracer.
@@ -32,7 +34,7 @@ class OpenTracingContext[F[_]: Sync, T <: Tracer, S <: Span](
   }
 }
 
-object OpenTracingContext {
+object OpenTracingContext extends StrictLogging {
 
   def apply[F[_]: Sync, T <: Tracer, S <: Span](
       tracer: T,
@@ -44,6 +46,19 @@ object OpenTracingContext {
     spanResource(tracer, operationName, parentSpan)
       .map(new OpenTracingContext(tracer, _))
       .evalMap(ctx => ctx.addTags(tags).map(_ => ctx))
+
+  def getOpenTracingContextBuilder[F[_]: Sync, T <: Tracer, S <: Span](
+      tracer: T
+  ): F[TracingContextBuilder[F]] =
+    registerGlobalTracer(tracer).map(_ => OpenTracingContext(tracer))
+
+  def registerGlobalTracer[F[_]: Sync](tracer: Tracer): F[Unit] = Sync[F].delay {
+    if (GlobalTracer.isRegistered()) {
+      logger.debug(s"Opentracing GlobalTracer is already registered. Skipping registration.")
+    } else {
+      GlobalTracer.register(tracer)
+    }
+  }
 
   def spanResource[F[_]: Sync, T <: Tracer, S <: Span](
       tracer: T,

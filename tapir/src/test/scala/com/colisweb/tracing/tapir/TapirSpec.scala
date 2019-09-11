@@ -8,7 +8,6 @@ import cats.effect._
 import cats.effect.concurrent.Deferred
 import cats.data.OptionT
 import cats.implicits._
-import com.colisweb.tracing._
 import scala.concurrent.ExecutionContext
 
 class TapirSpec extends AsyncFunSpec with Matchers {

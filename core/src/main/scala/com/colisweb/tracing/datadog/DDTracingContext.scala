@@ -6,7 +6,6 @@ import cats.syntax.all._
 import com.colisweb.tracing._
 import _root_.datadog.opentracing._
 import _root_.datadog.trace.api.DDTags.SERVICE_NAME
-import io.opentracing.util.GlobalTracer
 import com.colisweb.tracing.TracingContext
 import com.typesafe.scalalogging.StrictLogging
 
@@ -52,16 +51,14 @@ object DDTracingContext extends StrictLogging {
       .map(new DDTracingContext(tracer, _, serviceName))
       .evalMap(ctx => ctx.addTags(tags + (SERVICE_NAME -> serviceName)).map(_ => ctx))
 
-  private def buildAndRegisterDDTracer[F[_]: Sync] = Sync[F].delay {
-    val tracer = new DDTracer()
-    if (GlobalTracer.isRegistered()) {
-      logger.debug(s"Opentracing GlobalTracer is already registered. Skipping registration.")
-    } else {
-      GlobalTracer.register(tracer)
-    }
-    _root_.datadog.trace.api.GlobalTracer.registerIfAbsent(tracer)
-    tracer
-  }
+  private def buildAndRegisterDDTracer[F[_]: Sync] =
+    for {
+      tracer <- Sync[F].delay(new DDTracer())
+      _ <- OpenTracingContext.registerGlobalTracer(tracer)
+      _ <- Sync[F].delay {
+        _root_.datadog.trace.api.GlobalTracer.registerIfAbsent(tracer)
+      }
+    } yield tracer
 
   def getDDTracingContextBuilder[F[_]: Sync](serviceName: String): F[TracingContextBuilder[F]] =
     buildAndRegisterDDTracer.map(tracer => apply(tracer, serviceName))
