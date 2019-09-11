@@ -2,7 +2,6 @@ package com.colisweb.tracing
 
 import cats.effect._
 import cats.implicits._
-import com.colisweb.tracing.TracingContext._
 import io.opentracing._
 
 /**
@@ -16,7 +15,7 @@ class OpenTracingContext[F[_]: Sync, T <: Tracer, S <: Span](
 
   def childSpan(
       operationName: String,
-      tags: Map[String, String] = Map.empty
+      tags: Tags = Map.empty
   ): TracingContextResource[F] =
     OpenTracingContext[F, T, S](
       tracer,
@@ -26,7 +25,7 @@ class OpenTracingContext[F[_]: Sync, T <: Tracer, S <: Span](
       tags
     )
 
-  def addTags(tags: Map[String, String]): F[Unit] = Sync[F].delay {
+  def addTags(tags: Tags): F[Unit] = Sync[F].delay {
     tags.foreach {
       case (key, value) => span.setTag(key, value)
     }
@@ -40,7 +39,7 @@ object OpenTracingContext {
       parentSpan: Option[S] = None
   )(
       operationName: String,
-      tags: Map[String, String] = Map.empty
+      tags: Tags = Map.empty
   ): TracingContextResource[F] =
     spanResource(tracer, operationName, parentSpan)
       .map(new OpenTracingContext(tracer, _))

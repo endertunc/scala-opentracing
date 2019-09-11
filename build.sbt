@@ -1,7 +1,8 @@
 import Dependencies._
+import CompileFlags._
 import ReleaseTransformations._
 
-lazy val scala212 = "2.12.8"
+lazy val scala212 = "2.12.9"
 lazy val scala211 = "2.11.12"
 lazy val supportedScalaVersions = List(scala212, scala211)
 
@@ -11,6 +12,7 @@ ThisBuild / organizationName := "colisweb"
 ThisBuild / bintrayOrganization := Some("colisweb")
 ThisBuild / licenses += ("MIT", url("http://opensource.org/licenses/MIT"))
 ThisBuild / parallelExecution := false
+ThisBuild / scalacOptions ++= flags
 
 lazy val root = (project in file("."))
   .settings(

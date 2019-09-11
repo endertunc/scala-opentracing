@@ -3,10 +3,9 @@ package com.colisweb.tracing.datadog
 import cats.data.OptionT
 import cats.effect._
 import cats.syntax.all._
-import com.colisweb.tracing.OpenTracingContext
-import com.colisweb.tracing.TracingContext._
-import datadog.opentracing._
-import datadog.trace.api.DDTags.SERVICE_NAME
+import com.colisweb.tracing._
+import _root_.datadog.opentracing._
+import _root_.datadog.trace.api.DDTags.SERVICE_NAME
 import io.opentracing.util.GlobalTracer
 import com.colisweb.tracing.TracingContext
 import com.typesafe.scalalogging.StrictLogging
@@ -33,10 +32,10 @@ class DDTracingContext[F[_]: Sync](
       span.getSpanId()
     })
 
-  override def childSpan(operationName: String, tags: Map[String, String] = Map.empty) =
+  override def childSpan(operationName: String, tags: Tags = Map.empty) =
     DDTracingContext.apply[F](tracer, serviceName, Some(span))(operationName, tags)
 
-  def addTags(tags: Map[String, String]): F[Unit] = Sync[F].delay {
+  def addTags(tags: Tags): F[Unit] = Sync[F].delay {
     tags.foreach {
       case (key, value) => span.setTag(key, value)
     }
@@ -46,7 +45,7 @@ class DDTracingContext[F[_]: Sync](
 object DDTracingContext extends StrictLogging {
   def apply[F[_]: Sync](tracer: DDTracer, serviceName: String, parentSpan: Option[DDSpan] = None)(
       operationName: String,
-      tags: Map[String, String] = Map.empty
+      tags: Tags = Map.empty
   ): TracingContextResource[F] =
     OpenTracingContext
       .spanResource(tracer, operationName, parentSpan)
@@ -60,11 +59,10 @@ object DDTracingContext extends StrictLogging {
     } else {
       GlobalTracer.register(tracer)
     }
-    datadog.trace.api.GlobalTracer.registerIfAbsent(tracer)
+    _root_.datadog.trace.api.GlobalTracer.registerIfAbsent(tracer)
     tracer
   }
 
   def getDDTracingContextBuilder[F[_]: Sync](serviceName: String): F[TracingContextBuilder[F]] =
     buildAndRegisterDDTracer.map(tracer => apply(tracer, serviceName))
-
 }

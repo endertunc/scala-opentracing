@@ -4,9 +4,8 @@ import _root_.tapir._
 import _root_.tapir.server.http4s._
 import cats.effect._
 import cats.data._
-import com.colisweb.tracing.TracingContext
 import com.colisweb.tracing.http4s._
-import com.colisweb.tracing.TracingContext.TracingContextBuilder
+import com.colisweb.tracing._
 import org.http4s._
 import scala.reflect.ClassTag
 
