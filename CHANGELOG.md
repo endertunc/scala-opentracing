@@ -12,7 +12,7 @@ More infos about this file : https://keepachangelog.com/
 
 - Breaking : `com.colisweb.tracing.TracingContext.TracingContextBuilder` has been moved to `com.colisweb.tracing.TracingContextBuilder`
 - `LoggingTracingContext` now prints tags to the console
-- All tracing context companion objects now include a `get[...]TracingContext[F]` method that returns a `F[TracingContextBuilder[F]]` . The `TracingContext[F]` that this `TracingContextBuilder[F]` will build will have no parent span. This has been done for consitency with regard to the `DDTracingContext` which requires some effectful registration to be ran before the tracer can work properly.
+- All tracing context companion objects now include a `get[...]TracingContextBuilder[F]` method that returns a `F[TracingContextBuilder[F]]` . The `TracingContext[F]` that this `TracingContextBuilder[F]` will build will have no parent span. This has been done for consitency with regard to the `DDTracingContext` which requires some effectful registration to be ran before the tracer can work properly.
 - Code has been reorganised so all implicits can be imported with `com.colisweb.tracing.implicits._`
 - There is now a `Tags` type alias for `Map[String, String]`
 - Log correlation has been reorgnaised to support more than Datadog in the future

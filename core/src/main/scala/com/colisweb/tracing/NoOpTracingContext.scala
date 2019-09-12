@@ -3,6 +3,11 @@ package com.colisweb.tracing
 import cats.effect.Resource
 import cats.Applicative
 
+/**
+ * A tracing context that does nothing (no measurement, no log). This is useful
+ * as a mock implementation for your tests of if you need to disable tracing
+ * conditionnally
+ */
 class NoOpTracingContext[F[_]: Applicative] extends TracingContext[F] {
 
   def addTags(tags: Tags): F[Unit] = Applicative[F].unit

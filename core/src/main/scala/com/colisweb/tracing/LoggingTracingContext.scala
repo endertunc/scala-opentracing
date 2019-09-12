@@ -8,6 +8,12 @@ import scala.concurrent.duration.MILLISECONDS
 import com.typesafe.scalalogging.StrictLogging
 import cats.effect.concurrent.Ref
 
+/**
+ * A tracing context that will log the beginning and the end of all traces along with
+ * their tags.
+ * The traces will be emitted with a TRACE level, so make sure to configure your logging backend
+ * to ennable the TRACE level for com.colisweb.tracing
+ */
 class LoggingTracingContext[F[_]: Sync: Timer](
     traceIdP: String,
     spanIdP: String,
@@ -28,6 +34,10 @@ class LoggingTracingContext[F[_]: Sync: Timer](
 
 object LoggingTracingContext extends StrictLogging {
 
+  /**
+   * Returns a Resource[F, TracingContext[F]]. The first log will be emitted
+   * as the resource is acquired, the second log when it is released.
+   */
   def apply[F[_]: Sync: Timer](
       parentContext: Option[LoggingTracingContext[F]] = None,
       idGenerator: Option[F[String]] = None,
@@ -40,6 +50,8 @@ object LoggingTracingContext extends StrictLogging {
       .evalMap(ctx => ctx.addTags(tags).map(_ => ctx))
 
   /**
+   * Returns a F[TracingContextBuilder[F]]
+   * 
     * This is provided for convenience and conistency with regards to the other
     * tracing contexts types.
     */

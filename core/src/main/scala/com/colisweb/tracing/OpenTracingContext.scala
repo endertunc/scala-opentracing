@@ -36,6 +36,10 @@ class OpenTracingContext[F[_]: Sync, T <: Tracer, S <: Span](
 
 object OpenTracingContext extends StrictLogging {
 
+  /**
+   * Creates a Resource[F, TracingContext[F]]. The underlying span will
+   * be automatically closed when the Resource is released.
+   */
   def apply[F[_]: Sync, T <: Tracer, S <: Span](
       tracer: T,
       parentSpan: Option[S] = None
@@ -47,6 +51,10 @@ object OpenTracingContext extends StrictLogging {
       .map(new OpenTracingContext(tracer, _))
       .evalMap(ctx => ctx.addTags(tags).map(_ => ctx))
 
+  /**
+   * Registers the tracer as the GlobalTracer and returns a F[TracingContextBuilder[F]].
+   * This may be necessary depending on the concrete tracing system you use.
+   */
   def getOpenTracingContextBuilder[F[_]: Sync, T <: Tracer, S <: Span](
       tracer: T
   ): F[TracingContextBuilder[F]] =
@@ -60,7 +68,7 @@ object OpenTracingContext extends StrictLogging {
     }
   }
 
-  def spanResource[F[_]: Sync, T <: Tracer, S <: Span](
+  private[tracing] def spanResource[F[_]: Sync, T <: Tracer, S <: Span](
       tracer: T,
       operationName: String,
       parentSpan: Option[S] = None

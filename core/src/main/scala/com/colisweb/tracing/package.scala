@@ -1,7 +1,8 @@
 package com.colisweb
 
+import cats.effect.Resource
+
 package object tracing {
-  import cats.effect.Resource
   type Tags = Map[String, String]
   type TracingContextResource[F[_]] = Resource[F, TracingContext[F]]
 
