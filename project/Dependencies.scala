@@ -11,7 +11,7 @@ object Dependencies {
     val version = "0.31.0"
     val api = "io.opentracing" % "opentracing-api" % version
     val util = "io.opentracing" % "opentracing-util" % version
-    val dd = "com.datadoghq" % "dd-trace-ot" % "0.30.0"
+    val dd = "com.datadoghq" % "dd-trace-ot" % "0.38.0"
     val all = Seq(api, util, dd)
   }
 
