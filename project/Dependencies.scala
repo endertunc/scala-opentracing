@@ -11,7 +11,7 @@ object Dependencies {
   }
 
   object OpenTracing {
-    final val opentracing = "0.31.0"
+    final val opentracing = "0.33.0"
     final val api = "io.opentracing" % "opentracing-api" % opentracing
     final val util = "io.opentracing" % "opentracing-util" % opentracing
     final val dd = "com.datadoghq" % "dd-trace-ot" % "0.30.0"
