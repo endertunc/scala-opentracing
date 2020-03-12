@@ -1,8 +1,8 @@
 package com.colisweb.tracing.context.datadog
 
+import _root_.datadog.opentracing.DDTracer.DDTracerBuilder
 import _root_.datadog.opentracing._
 import _root_.datadog.trace.api.DDTags.SERVICE_NAME
-import _root_.datadog.opentracing.DDTracer.DDTracerBuilder
 import _root_.datadog.trace.api.{GlobalTracer => DDGlobalTracer}
 import cats.data.OptionT
 import cats.effect._
@@ -101,7 +101,7 @@ object DDTracingContext extends StrictLogging {
   private def buildAndRegisterDDTracer[F[_]: Sync]: F[DDTracer] =
     for {
       tracer <- Sync[F].delay(new DDTracerBuilder().build())
-      _ <- Sync[F].delay(OpenGlobalTracer.registerIfAbsent(tracer))
-      _ <- Sync[F].delay(DDGlobalTracer.registerIfAbsent(tracer))
+      _ = OpenGlobalTracer.registerIfAbsent(tracer)
+      _ = DDGlobalTracer.registerIfAbsent(tracer)
     } yield tracer
 }
